@@ -26,16 +26,22 @@ app.get("/", (req, res) => {
 app.route("/api/profiles").get(getProfiles);
 app.get("/api/profiles/search", searchProfiles);
 
-pool
-  .connect()
-  .then(async () => {
-    console.log("Connected to Postgres");
+const startServer = async () => {
+  try {
+    const client = await pool.connect();
+    console.log("✅ Successfully connected to external Postgres");
+    client.release();
+
     await initDb();
-    // Run migrations and seeds
     await seedDatabase();
 
-    app.listen(3000, () => {
-      console.log("Server running on port 3000");
+    app.listen(process.env.PORT || 3000, "0.0.0.0", () => {
+      console.log(`🚀 Server spinning on port ${process.env.PORT || 3000}`);
     });
-  })
-  .catch((err) => console.error("Connection error", err.stack));
+  } catch (err) {
+    console.error("❌ CRITICAL: Could not connect to DB", err.message);
+    process.exit(1);
+  }
+};
+
+startServer();
