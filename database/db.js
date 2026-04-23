@@ -12,6 +12,10 @@ const pool = new Pool({
   database: process.env.DATABASE,
   password: process.env.PASSWORD,
   port: process.env.PORT,
+  connectionString: process.env.connectionString,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 // Create profile table query
